@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Open+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <!-- <div>
+        <input type="text" class="input-text">
+        <button class="submit-button">add todo</button>
+    </div>
+
+    <div id="todoList">
+        
+    </div> -->
+
+    <div class="container filters">
+        <select id="layout">
+            <option value="grid" selected>Grid</option>
+            <option value="grid3">Grid 3 Columns</option>
+            <option value="list">List</option>
+        </select>
+
+        <select id="filters">
+            <option value="all" selected>All</option>
+        </select>
+
+        <label>
+            Min
+            <input type="number" class="price-filter__min-price">
+        </label>
+        <label>
+            Max
+            <input type="number" class="price-filter__max-price">
+        </label>
+
+        
+        <div class="search-wrapper">
+            <input type="text" placeholder="Search" class="item-search">
+            <button class="reset-filters">Reset filters</button>
+        </div>
+        
+
+    </div>
+
+    <div id="products_list" class="container products_wrapper">
+        
+    </div>
+
+    <script src="/script.js" defer></script>
+</body>
+</html>
