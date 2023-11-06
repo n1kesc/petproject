@@ -27,7 +27,8 @@ body {
     margin-bottom: 20px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 30px;
+    column-gap: 30px;
+    row-gap: 10px;
 }
 
 .filters > :last-child {
@@ -50,7 +51,7 @@ label {
 
 .price-filter__min-price,
 .price-filter__max-price {
-    width: 130px;
+    width: 100%;
     height: 100%;
 }
 
@@ -60,7 +61,7 @@ label {
 
 .search-wrapper {
     display: flex;
-    gap: 10px;
+    gap: 30px;
 }
 
 .item-search {
@@ -96,8 +97,9 @@ label {
 }
 
 .products_wrapper.list .product_item {
-    display: grid;
-    grid-template-columns: 150px max-content max-content 1fr max-content;
+    flex-direction: row;
+    gap: 40px;
+    align-items: center;
 }
 
 .products_wrapper.list .product_item--thumbnail {
@@ -114,8 +116,18 @@ label {
     align-items: center;
 }
 
+.products_wrapper.list .product_item--descr {
+    flex-grow: 1;
+}
+
+.products_wrapper.list .product_item-inner {
+    min-width: 150px;
+}
+
 .products_wrapper.list .product_item-inner {
     margin-top: 0;
+    justify-content: flex-start;
+    gap: 30px;
 }
 
 .product_item {
@@ -125,7 +137,9 @@ label {
     padding: 15px;
     border-radius: 5px;
     border: 0.5px solid #C5C5C5;
-    overflow: hidden; 
+    overflow: hidden;
+    min-width: 170px;
+    max-width: 100%;
 }
 
 .product_item.visible {
@@ -138,6 +152,17 @@ label {
     object-fit: cover;
     object-position: center;
     border-radius: 5px;
+}
+
+.product_item--top-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.products_wrapper.list .product_item--top-wrapper {
+    gap: 20px;
 }
 
 .product_item--cat {
@@ -177,6 +202,10 @@ label {
     align-items: center;
 }
 
+.products_wrapper.list .product_item__price {
+    justify-content: center;
+}
+
 .product_item__price-old {
     text-decoration: line-through;
     font-size: 14px;
@@ -199,7 +228,7 @@ label {
     color: #000;
     background-color: #fff;
     cursor: pointer;
-    padding: 10px 0;
+    padding: 10px 20px;
     border-radius: 5px;
     border: 0.5px solid #606060;
     transition: background-color 0.3s ease, border-color 0.3s ease;

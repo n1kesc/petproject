@@ -82,9 +82,7 @@ function shuffle(array) {
 
     // insert products in product list container
     for (let i = 0; i < products.length; i++) {
-        const { discountPercentage, price } = products[i]; // { price:..., discountPercentage:... }
-        //const [firstElement, secondElement] = [1, 2];
-
+        const { discountPercentage, price } = products[i]; 
         if (discountPercentage !== 0) {
             products[i].oldPrice = Math.round(price / (1 - discountPercentage / 100));
         }
@@ -107,8 +105,10 @@ function shuffle(array) {
         productsList.insertAdjacentHTML("beforeend", `
             <div class="product_item ${products[i].category} visible" data-id="${products[i].id}">
                 <img src="${products[i].thumbnail}" class="product_item--thumbnail" alt="${products[i].title}">
-                <a href="#" class="product_item--cat">${products[i].category}</a>
-                <div class="product_item--title">${products[i].title}</div>
+                <div class="product_item--top-wrapper">
+                    <a href="#" class="product_item--cat">${products[i].category}</a>
+                    <div class="product_item--title">${products[i].title}</div>
+                </div>
                 <div class="product_item--descr">${products[i].description}</div>
                 <div class="product_item-inner">
                     <div class="product_item__price">${priceHtml}</div>
@@ -165,11 +165,7 @@ function shuffle(array) {
         setFilterCategory(filter.value);
     });
 
-    /*
-        TODO:
-            сделать так, что бы при клике на категорию в продукте фильтр становился этой категорией
-    */
-
+    // change category filter on item click
     const itemCats = productsList.querySelectorAll('.product_item--cat');
     itemCats.forEach(cat => {
         cat.addEventListener('click', (event) => {
@@ -187,7 +183,7 @@ function shuffle(array) {
         let minValue = parseInt(minPrice.value);
         for (let i = 0; i < productItems.length; i++) {
             let product = productItems[i];
-            let productPrice = parseInt(product.querySelector('.product_item__price').innerText);
+            let productPrice = parseInt(product.querySelector('.product_item__price-sale').innerText);
             if (productPrice < minValue) {
                 productItems[i].classList.add('--underprice');
             } else {
@@ -200,7 +196,7 @@ function shuffle(array) {
         let maxValue = parseInt(maxPrice.value);
         for (let i = 0; i < productItems.length; i++) {
             let product = productItems[i];
-            let productPrice = parseInt(product.querySelector('.product_item__price').innerText);
+            let productPrice = parseInt(product.querySelector('.product_item__price-sale').innerText);
             if (productPrice > maxValue) {
                 productItems[i].classList.add('--overprice');
             } else {
@@ -222,12 +218,8 @@ function shuffle(array) {
         }
     });
 
-    /*
-        сделать кнопку add to card, при нажатии на неё добавлять продукт в массив, выводить массив в консоль лог
-    */
-
+    // add to card button
     const addButtons = document.querySelectorAll('.product_item--button');
-
     let cartArray = [];
     addButtons.forEach(addButton => {
         addButton.addEventListener('click', () => {
@@ -244,7 +236,7 @@ function shuffle(array) {
         });
     });
 
-    // TODO: сделать clear filters кнопку под фильтрами
+    // Clear filters button
     const resetFilters = () => {
         minPrice.value = '';
         maxPrice.value = '';
