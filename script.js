@@ -15,6 +15,10 @@ function shuffle(array) {
     return array;
 }
 
+const delay = (ms) => {
+    return new Promise(res => { setTimeout(res, ms) })
+}
+
 // const todoListHtml = document.getElementById('todoList');
 // const button = document.querySelector('.submit-button');
 // const input = document.querySelector('.input-text');
@@ -64,21 +68,24 @@ function shuffle(array) {
     
     
     select.addEventListener('change', (e) => {
-        productsList.dataset.layout = select.value;
-        if (select.value === 'grid3') {
-            productsList.classList.remove('list');
-            productsList.classList.add('grid3');
-        } else if (select.value === 'list') {
-            productsList.classList.remove('grid3');
-            productsList.classList.add('list');
-        } else {
-            productsList.classList.remove('list');
-            productsList.classList.remove('grid3');
-        }
+        productsList.style.setProperty('--columns', select.value)
+
+        productsList.dataset.columns = select.value;
+
+        // if (select.value === 'grid3') {
+        //     productsList.classList.remove('list');
+        //     productsList.classList.add('grid3');
+        // } else if (select.value === 'list') {
+        //     productsList.classList.remove('grid3');
+        //     productsList.classList.add('list');
+        // } else {
+        //     productsList.classList.remove('list');
+        //     productsList.classList.remove('grid3');
+        // }
     });
 
     const data = await fetch('https://dummyjson.com/products').then(res => res.json());
-    const products = shuffle(data.products);
+    let products = shuffle(data.products);
 
     // insert products in product list container
     for (let i = 0; i < products.length; i++) {
@@ -87,11 +94,11 @@ function shuffle(array) {
             products[i].oldPrice = Math.round(price / (1 - discountPercentage / 100));
         }
 
-        let priceHtml = `<div class="product_item__price-origin">${price}$</div>`;
+        let priceHtml = `<div class="product_item__price">${price}$</div>`;
         if (products[i].oldPrice) {
             priceHtml = `
                 <div class="product_item__price-old">${products[i].oldPrice}$</div>
-                <div class="product_item__price-sale">${price}$</div>
+                <div class="product_item__price --sale">${price}$</div>
             `;
         }
 
@@ -104,15 +111,17 @@ function shuffle(array) {
 
         productsList.insertAdjacentHTML("beforeend", `
             <div class="product_item ${products[i].category} visible" data-id="${products[i].id}">
-                <img src="${products[i].thumbnail}" class="product_item--thumbnail" alt="${products[i].title}">
-                <div class="product_item--top-wrapper">
-                    <a href="#" class="product_item--cat">${products[i].category}</a>
-                    <div class="product_item--title">${products[i].title}</div>
-                </div>
-                <div class="product_item--descr">${products[i].description}</div>
-                <div class="product_item-inner">
-                    <div class="product_item__price">${priceHtml}</div>
-                    <button class="product_item--button" data-id="${products[i].id}">add to card</button>
+                <div class="product_item--wrapper">
+                    <img src="${products[i].thumbnail}" class="product_item--thumbnail" alt="${products[i].title}">
+                    <div class="product_item--top-wrapper">
+                        <a href="#" class="product_item--cat">${products[i].category}</a>
+                        <div class="product_item--title">${products[i].title}</div>
+                    </div>
+                    <div class="product_item--descr">${products[i].description}</div>
+                    <div class="product_item-inner">
+                        <div class="product_item__price-wrapper">${priceHtml}</div>
+                        <button class="product_item--button" data-id="${products[i].id}">add to card</button>
+                    </div>
                 </div>
             </div>
         `);
@@ -183,7 +192,7 @@ function shuffle(array) {
         let minValue = parseInt(minPrice.value);
         for (let i = 0; i < productItems.length; i++) {
             let product = productItems[i];
-            let productPrice = parseInt(product.querySelector('.product_item__price-sale').innerText);
+            let productPrice = parseInt(product.querySelector('.product_item__price').innerText);
             if (productPrice < minValue) {
                 productItems[i].classList.add('--underprice');
             } else {
@@ -196,7 +205,7 @@ function shuffle(array) {
         let maxValue = parseInt(maxPrice.value);
         for (let i = 0; i < productItems.length; i++) {
             let product = productItems[i];
-            let productPrice = parseInt(product.querySelector('.product_item__price-sale').innerText);
+            let productPrice = parseInt(product.querySelector('.product_item__price').innerText);
             if (productPrice > maxValue) {
                 productItems[i].classList.add('--overprice');
             } else {
@@ -249,8 +258,32 @@ function shuffle(array) {
             productItem.classList.remove('--search-hide');
         });
     }
-
     resetFiltersBtn.addEventListener('click', resetFilters);
     
+
+    // load more
+    const loadMoreBtn = document.getElementById('load-more');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', async () => {
+            // добавить состояние loading у кнопки, и кнопку выключить (атрибут disabled)
+
+
+
+            // ======
+            await delay(1500);
+            let newProducts = await fetch(`https://dummyjson.com/products?skip=${products.length}`).then(res => res.json()).then(data => data.products);
+            // =====
+
+            // убрать состояние loading у кнопки, и кноку включить
+            
+
+
+            products = [...products, ...newProducts];
+            console.log(products)
+
+            // 1. newProducts добавить в html
+            // 2. если продуктов уже 100 штук прятать или дизейблить кнопку
+        });
+    }
 })();
 

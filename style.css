@@ -82,64 +82,62 @@ label {
     border-color: #000;
 }
 
+
 .products_wrapper {
+    --columns: 6;
+    --gap: 30px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 30px;
-}
-
-.products_wrapper.grid3 {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-.products_wrapper.list {
-    grid-template-columns: 1fr;
-}
-
-.products_wrapper.list .product_item {
-    flex-direction: row;
-    gap: 40px;
-    align-items: center;
-}
-
-.products_wrapper.list .product_item--thumbnail {
-    max-width: 150px;
-}
-
-.products_wrapper.list .product_item--title {
-    min-width: 250px;
-}
-
-.products_wrapper.list .product_item--title,
-.products_wrapper.list .product_item--descr {
-    display: flex;
-    align-items: center;
-}
-
-.products_wrapper.list .product_item--descr {
-    flex-grow: 1;
-}
-
-.products_wrapper.list .product_item-inner {
-    min-width: 150px;
-}
-
-.products_wrapper.list .product_item-inner {
-    margin-top: 0;
-    justify-content: flex-start;
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(170px, calc((100% - (var(--columns) - 1) * var(--gap)) / var(--columns))));
+    gap: var(--gap);
 }
 
 .product_item {
     display: none;
+    container-type: inline-size;
+}
+
+.product_item--wrapper {
+    display: flex;
     flex-direction: column;
     gap: 15px;
     padding: 15px;
     border-radius: 5px;
     border: 0.5px solid #C5C5C5;
     overflow: hidden;
-    min-width: 170px;
-    max-width: 100%;
+    flex: 1;
+}
+
+@container (min-width: 700px) {
+    .product_item--wrapper {
+        flex-direction: row;
+        gap: 40px;
+        align-items: center;
+    }
+    .product_item--thumbnail {
+        max-width: 150px;
+    }
+    .product_item--title {
+        min-width: 250px;
+    }
+    .product_item--title,
+    .product_item--descr {
+        display: flex;
+        align-items: center;
+    }
+
+    .product_item--descr {
+        flex-grow: 1;
+    }
+
+    .product_item-inner {
+        min-width: 150px;
+    }
+
+    .product_item-inner {
+        margin-top: 0;
+        justify-content: flex-start;
+        gap: 30px;
+    }
 }
 
 .product_item.visible {
@@ -196,7 +194,7 @@ label {
     margin-top: auto;
 }
 
-.product_item__price {
+.product_item__price-wrapper {
     display: flex;
     gap: 10px;
     align-items: center;
@@ -211,7 +209,7 @@ label {
     font-size: 14px;
 }
 
-.product_item__price-sale {
+.product_item__price.--sale {
     color: #e32b2b;
     font-size: 20px;
     font-weight: 700;
