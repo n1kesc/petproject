@@ -65,7 +65,7 @@ const delay = (ms) => {
     const maxPrice = document.querySelector('.price-filter__max-price');
     const search = document.querySelector('.item-search');
     const resetFiltersBtn = document.querySelector('.reset-filters')
-    
+    let productItems;
     
     select.addEventListener('change', (e) => {
         productsList.style.setProperty('--columns', select.value)
@@ -84,50 +84,58 @@ const delay = (ms) => {
         // }
     });
 
-    const data = await fetch('https://dummyjson.com/products').then(res => res.json());
+    const data = await fetch('https://dummyjson.com/products?limit=6').then(res => res.json());
     let products = shuffle(data.products);
 
-    // insert products in product list container
-    for (let i = 0; i < products.length; i++) {
-        const { discountPercentage, price } = products[i]; 
-        if (discountPercentage !== 0) {
-            products[i].oldPrice = Math.round(price / (1 - discountPercentage / 100));
-        }
+    const addProductsToHtml = (products) => {
+        // insert products in product list container
+        for (let i = 0; i < products.length; i++) {
+            const { discountPercentage, price } = products[i]; 
+            if (discountPercentage !== 0) {
+                products[i].oldPrice = Math.round(price / (1 - discountPercentage / 100));
+            }
 
-        let priceHtml = `<div class="product_item__price">${price}$</div>`;
-        if (products[i].oldPrice) {
-            priceHtml = `
-                <div class="product_item__price-old">${products[i].oldPrice}$</div>
-                <div class="product_item__price --sale">${price}$</div>
-            `;
-        }
+            let priceHtml = `<div class="product_item__price">${price}$</div>`;
+            if (products[i].oldPrice) {
+                priceHtml = `
+                    <div class="product_item__price-old">${products[i].oldPrice}$</div>
+                    <div class="product_item__price --sale">${price}$</div>
+                `;
+            }
 
-        // let priceHtml = products[i].oldPrice ? `
-        //     <div class="product_item__price-old">${products[i].oldPrice}$</div>
-        //     <div class="product_item__price-sale">${products[i].price}$</div>
-        // ` : `
-        //     <div class="product_item__price-origin">${products[i].price}$</div>
-        // `;
+            // let priceHtml = products[i].oldPrice ? `
+            //     <div class="product_item__price-old">${products[i].oldPrice}$</div>
+            //     <div class="product_item__price-sale">${products[i].price}$</div>
+            // ` : `
+            //     <div class="product_item__price-origin">${products[i].price}$</div>
+            // `;
 
-        productsList.insertAdjacentHTML("beforeend", `
-            <div class="product_item ${products[i].category} visible" data-id="${products[i].id}">
-                <div class="product_item--wrapper">
-                    <img src="${products[i].thumbnail}" class="product_item--thumbnail" alt="${products[i].title}">
-                    <div class="product_item--top-wrapper">
-                        <a href="#" class="product_item--cat">${products[i].category}</a>
-                        <div class="product_item--title">${products[i].title}</div>
-                    </div>
-                    <div class="product_item--descr">${products[i].description}</div>
-                    <div class="product_item-inner">
-                        <div class="product_item__price-wrapper">${priceHtml}</div>
-                        <button class="product_item--button" data-id="${products[i].id}">add to card</button>
+            productsList.insertAdjacentHTML("beforeend", `
+                <div class="product_item ${products[i].category} visible" data-id="${products[i].id}">
+                    <div class="product_item--wrapper">
+                        <div class="product_item--thumbnail">
+                            <img 
+                                src="${products[i].thumbnail}" 
+                                alt="${products[i].title}"
+                            >
+                        </div>
+                        <div class="product_item--top-wrapper">
+                            <a href="#" class="product_item--cat">${products[i].category}</a>
+                            <div class="product_item--title">${products[i].title}</div>
+                        </div>
+                        <div class="product_item--descr">${products[i].description}</div>
+                        <div class="product_item-inner">
+                            <div class="product_item__price-wrapper">${priceHtml}</div>
+                            <button class="product_item--button" data-id="${products[i].id}">add to card</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `);
+            `);
+        }
+        productItems = productsList.querySelectorAll('.product_item');
     }
+    addProductsToHtml(products);
 
-    const productItems = productsList.querySelectorAll('.product_item');
     const categories = [...Array.from(new Set(products.map(p => p.category)))];
 
     // categories.forEach(cat => {
@@ -186,7 +194,6 @@ const delay = (ms) => {
             }
         });
     });
-
 
     minPrice.addEventListener('keyup', (e) => {
         let minValue = parseInt(minPrice.value);
@@ -265,24 +272,26 @@ const delay = (ms) => {
     const loadMoreBtn = document.getElementById('load-more');
     if (loadMoreBtn) {
         loadMoreBtn.addEventListener('click', async () => {
-            // добавить состояние loading у кнопки, и кнопку выключить (атрибут disabled)
 
-
+            loadMoreBtn.classList.add('show-loader');
 
             // ======
             await delay(1500);
-            let newProducts = await fetch(`https://dummyjson.com/products?skip=${products.length}`).then(res => res.json()).then(data => data.products);
+            let response = await fetch(`https://dummyjson.com/products?limit=6&skip=${products.length}`).then(res => res.json());
+            let newProducts = response.products;
             // =====
 
-            // убрать состояние loading у кнопки, и кноку включить
-            
-
+            loadMoreBtn.classList.remove('show-loader');
 
             products = [...products, ...newProducts];
-            console.log(products)
 
-            // 1. newProducts добавить в html
-            // 2. если продуктов уже 100 штук прятать или дизейблить кнопку
+
+            addProductsToHtml(newProducts);
+
+            if (products.length >= response.total) {
+                loadMoreBtn.classList.add('loaded');
+            }
+
         });
     }
 })();

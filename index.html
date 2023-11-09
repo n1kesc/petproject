@@ -5,6 +5,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        .product_item--thumbnail {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product_item--thumbnail img {
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
+    </style>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Open+Sans&display=swap" rel="stylesheet">
 </head>
@@ -12,9 +30,9 @@
 
     <div class="container filters">
         <select id="layout">
-            <option value="6" selected>Grid</option>
+            <option value="6">Grid</option>
             <option value="4">Grid 4 Columns</option>
-            <option value="3">Grid 3 Columns</option>
+            <option value="3" selected>Grid 3 Columns</option>
             <option value="1">List</option>
         </select>
 
@@ -41,7 +59,12 @@
     </div>
 
     <div id="products_list" class="container products_wrapper"></div>
-    <!-- <button id="load-more">Load more</button> -->
+    <div style="text-align: center;">
+        <button class="load-more" id="load-more">
+            <div class="loader-more__text">Load more</div>
+            <span class="loading"></span>
+        </button>
+    </div>
     
 
     <script src="script.js" defer></script>
