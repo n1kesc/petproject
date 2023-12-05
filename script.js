@@ -59,36 +59,38 @@ const delay = (ms) => {
 
 (async function() {
     const productsList = document.getElementById('products_list');
+    const bucketList = document.getElementById('bucket_list');
+    
     const select = document.getElementById('layout');
     const filter = document.getElementById('filters');
     const minPrice = document.querySelector('.price-filter__min-price');
     const maxPrice = document.querySelector('.price-filter__max-price');
     const search = document.querySelector('.item-search');
-    const resetFiltersBtn = document.querySelector('.reset-filters')
+    const resetFiltersBtn = document.querySelector('.reset-filters');
+    const bucketButton = document.querySelector('.bucket__button--link');
+    const bucketCount = document.querySelector('.bucket__button--count');
+    const savedBucket = JSON.parse(localStorage.getItem('cart'));
+    // let cartArray = savedBucket || [];
+    let cartArray = [];
+
     let productItems;
-    
+
     select.addEventListener('change', (e) => {
         productsList.style.setProperty('--columns', select.value)
-
         productsList.dataset.columns = select.value;
-
-        // if (select.value === 'grid3') {
-        //     productsList.classList.remove('list');
-        //     productsList.classList.add('grid3');
-        // } else if (select.value === 'list') {
-        //     productsList.classList.remove('grid3');
-        //     productsList.classList.add('list');
-        // } else {
-        //     productsList.classList.remove('list');
-        //     productsList.classList.remove('grid3');
-        // }
     });
 
     const data = await fetch('https://dummyjson.com/products?limit=6').then(res => res.json());
     let products = shuffle(data.products);
 
+
+
+    bucketList.addEventListener('DOMSubtreeModified', () => {
+        bucketCount.textContent = cartArray.reduce((acc, p) => p.count + acc, 0);
+    });
+
+    // insert products in product list container
     const addProductsToHtml = (products) => {
-        // insert products in product list container
         for (let i = 0; i < products.length; i++) {
             const { discountPercentage, price } = products[i]; 
             if (discountPercentage !== 0) {
@@ -114,7 +116,7 @@ const delay = (ms) => {
                 <div class="product_item ${products[i].category} visible" data-id="${products[i].id}">
                     <div class="product_item--wrapper">
                         <div class="product_item--thumbnail">
-                            <img 
+                            <img
                                 src="${products[i].thumbnail}" 
                                 alt="${products[i].title}"
                             >
@@ -134,7 +136,97 @@ const delay = (ms) => {
         }
         productItems = productsList.querySelectorAll('.product_item');
     }
+
     addProductsToHtml(products);
+
+    const PriceHtml = (count, price) => {
+        let priceHtml = price;
+
+        // if only one item return just price
+        if (count > 1) {
+            priceHtml = `
+                ${price}x${count}<br>
+                ${price*count}
+            `;
+        }
+        return `<div class="product_item__price-wrapper">
+            ${priceHtml}$
+        </div>`;
+    }
+
+    // insert products in bucket container
+    const addProductsToBucketHtml = (products) => {
+        bucketList.innerHTML = '';
+        let bucketHtml = '';
+        const totalPrice = cartArray.reduce((acc, p) => (p.count * p.product.price) + acc, 0);
+
+        bucketHtml += products.map(({count, product: { category, id, thumbnail, title, description, price }}) => `
+            <div class="product_item ${category} visible" data-id="${id}">
+                <div class="product_item--wrapper">
+                    <div class="product_item--thumbnail">
+                        <img src="${thumbnail}" alt="${title}">
+                    </div>
+                    <div class="product_item--top-wrapper">
+                        <a href="#" class="product_item--cat">${category}</a>
+                        <div class="product_item--title">${title}</div>
+                    </div>
+                    <div class="product_item--descr">${description}</div>
+                    <div class="product_item-inner">
+                        ${PriceHtml(count, price)}
+                        <input type="number" min="1" class="product-value" value="${count}"></input>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        bucketHtml += `<div id="bucket_total-price" class="bucket_price">${totalPrice}</div>`;
+
+        bucketList.innerHTML = bucketHtml;
+        // products.forEach(({count, product}) => {
+        //     const {id, thumbnail, category, title, price, description} = product;
+        //     const totalItemPrice = price * count;
+        //     // let priceHtml = `<div class="product_item__price-single">${price}$</div>`;
+        //     // if (count !== 1) 
+        //     //     priceHtml += `<div class="product_item__price-total">${totalPrice}$</div>`;
+
+        //     const productItem =
+        //     `
+        //     <div class="product_item ${category} visible" data-id="${id}">
+        //         <div class="product_item--wrapper">
+        //             <div class="product_item--thumbnail">
+        //                 <img
+        //                     src="${thumbnail}"
+        //                     alt="${title}"
+        //                 >
+        //             </div>
+        //             <div class="product_item--top-wrapper">
+        //                 <a href="#" class="product_item--cat">${category}</a>
+        //                 <div class="product_item--title">${title}</div>
+        //             </div>
+        //             <div class="product_item--descr">${description}</div>
+        //             <div class="product_item-inner">
+        //                 <div class="product_item__price-wrapper">${totalItemPrice}$</div>
+        //                 <input type="number" min="1" class="product-value" value="${count}"></input>
+        //             </div>
+        //         </div>
+        //     </div>
+        //     `;
+            
+        //     bucketList.insertAdjacentHTML('beforeend', productItem);
+        // });
+
+        document.querySelectorAll('#bucket_list .product-value').forEach(input => {
+            const productWrapper = input.closest('[data-id]');
+            const productId = Number(productWrapper.dataset.id);
+            input.addEventListener('change', () => {
+                const productIndexInArray = cartArray.findIndex(p => p.product.id === productId);
+                cartArray[productIndexInArray].count = parseInt(input.value);
+                addProductsToBucketHtml(cartArray);
+            });
+        });
+    }
+
+    addProductsToBucketHtml(cartArray);
 
     const categories = [...Array.from(new Set(products.map(p => p.category)))];
 
@@ -195,6 +287,7 @@ const delay = (ms) => {
         });
     });
 
+    // min price filter
     minPrice.addEventListener('keyup', (e) => {
         let minValue = parseInt(minPrice.value);
         for (let i = 0; i < productItems.length; i++) {
@@ -208,6 +301,7 @@ const delay = (ms) => {
         }
     });
 
+    // max price filter
     maxPrice.addEventListener('keyup', (e) => {
         let maxValue = parseInt(maxPrice.value);
         for (let i = 0; i < productItems.length; i++) {
@@ -221,6 +315,7 @@ const delay = (ms) => {
         }
     });
 
+    // search
     search.addEventListener('keyup', (e) => {
         let searchRequest = search.value.toLowerCase();
         for (let i = 0; i < productItems.length; i++) {
@@ -236,23 +331,26 @@ const delay = (ms) => {
 
     // add to card button
     const addButtons = document.querySelectorAll('.product_item--button');
-    let cartArray = [];
     addButtons.forEach(addButton => {
         addButton.addEventListener('click', () => {
             let productId = parseInt(addButton.dataset.id);
-            // let product = products.find(p => p.id === productId);
-            // if (product) cartArray.push(product)
-            for (let i = 0; i < products.length; i++) {
-                if (productId === products[i].id) {
-                    cartArray.push(products[i]);
-                    console.log(cartArray)
-                    break;
-                }
+            let product = products.find(p => p.id === productId);
+            // check if product already exist in cart
+            let existProduct = cartArray.findIndex(p => p.product.id === productId);
+            // if exist
+            if (existProduct !== -1) {
+                cartArray[existProduct].count = cartArray[existProduct].count + 1
             }
+            // if not exist add to cart with count 1
+            else {
+                cartArray.push({count: 1, product: product})
+            }
+            // [{count: 2, product: {id:..., name:...}}, [2, {id:..., name:....}]]
+            addProductsToBucketHtml(cartArray);
         });
     });
 
-    // Clear filters button
+    // clear filters button
     const resetFilters = () => {
         minPrice.value = '';
         maxPrice.value = '';
@@ -279,12 +377,11 @@ const delay = (ms) => {
             await delay(1500);
             let response = await fetch(`https://dummyjson.com/products?limit=6&skip=${products.length}`).then(res => res.json());
             let newProducts = response.products;
-            // =====
+            // ======
 
             loadMoreBtn.classList.remove('show-loader');
 
             products = [...products, ...newProducts];
-
 
             addProductsToHtml(newProducts);
 
@@ -294,5 +391,21 @@ const delay = (ms) => {
 
         });
     }
+
+    const bucketWrapper = document.querySelector('.bucket-wrapper');
+
+    // show bucket
+    document.body.addEventListener('click', (el) => {
+        if (el.target === bucketButton || bucketButton.contains(el.target)) {
+            bucketList.classList.toggle('hidden')
+        } else if (!bucketWrapper.contains(el.target)) {
+            bucketList.classList.add('hidden')
+        }
+    })
+
+    window.onbeforeunload = function(e) {
+        localStorage.setItem('cart', JSON.stringify(cartArray));
+    };
+
 })();
 

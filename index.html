@@ -28,6 +28,22 @@
 </head>
 <body>
 
+    <div class="container bucket__container">
+        <div class="bucket-wrapper" style="display: inline-flex; margin-left: auto;">
+            <button class="bucket__button--link">
+                <div class="bucket__button--inner">
+                    <svg width="30" height="30" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M.75-.02a.75.75 0 100 1.5l.408-.006 1.606 1.281 1.839 6.881L4.237 12a2 2 0 102.188 2.722l5.705.028a2 2 0 100-1.5l-5.705-.028a2.007 2.007 0 00-.722-.898l.438-2.632 7.933.027 1.91-7.715H4.227L1.683-.026 1.68-.02v-.005L.75-.02z" fill="#000"></path>
+                    </svg>
+                    <span class="bucket__button--count">0</span>
+                </div>
+            </button>
+            <div id="bucket_list" class="bucket hidden">
+            </div>
+            
+        </div>
+    </div>
+
     <div class="container filters">
         <select id="layout">
             <option value="6">Grid</option>
@@ -54,11 +70,10 @@
             <input type="text" placeholder="Search" class="item-search">
             <button class="reset-filters">Reset filters</button>
         </div>
-        
-
     </div>
 
     <div id="products_list" class="container products_wrapper"></div>
+
     <div style="text-align: center;">
         <button class="load-more" id="load-more">
             <div class="loader-more__text">Load more</div>
@@ -66,7 +81,6 @@
         </button>
     </div>
     
-
     <script src="script.js" defer></script>
 </body>
 </html>

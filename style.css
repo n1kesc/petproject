@@ -6,6 +6,10 @@
     margin: 0;
 }
 
+:root {
+    --container-width: 1200px;
+}
+
 body {
     min-height: 100vh;
     padding: 100px 15px;
@@ -18,9 +22,72 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: var(--container-width);
     padding: 0 15px;
     margin: 0 auto;
+}
+
+.bucket__container {
+    position: relative;
+    display: flex;
+    margin-bottom: 10px;
+    flex-direction: column;
+}
+
+.bucket__button--link {
+    display: inline-block;
+    margin-left: auto;
+    border: none;
+    cursor: pointer;
+    background-color: #fff;
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}
+
+.bucket__button--link:hover {
+    transform: scale(1.05);
+}
+
+.bucket__button--inner {
+    position: relative;
+}
+
+.bucket__button--count {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    border-radius: 50%;
+    background-color: #ff3b30;
+    color: white;
+    padding: 3px;
+    text-align: center;
+    min-width: 25px;
+}
+
+.bucket {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 40px;
+    z-index: 1;
+    background-color: #fff;
+    height: auto;
+    width: calc(var(--container-width) - 30px);
+    max-width: 100vw;
+    right: 0;
+    box-shadow: 0 15px 50px rgba(0,0,0,.25);
+}
+
+.bucket .product_item-inner {
+    align-items: center;
+}
+
+.bucket.hidden {
+    display: none;
+}
+
+.bucket-wrapper {
+    position: relative;
 }
 
 .filters {
@@ -110,17 +177,11 @@ label {
 
 @container (min-width: 700px) {
     .product_item--wrapper {
-        flex-direction: row;
+        display: grid;
+        grid-template-columns: 150px 250px 1fr 150px;
+        /* flex-direction: row;
+        align-items: center; */
         gap: 40px;
-        align-items: center;
-    }
-
-    .product_item--thumbnail {
-        max-width: 150px;
-    }
-
-    .product_item--title {
-        min-width: 250px;
     }
 
     .product_item--title,
@@ -134,13 +195,17 @@ label {
     }
 
     .product_item-inner {
-        min-width: 150px;
-    }
-
-    .product_item-inner {
         margin-top: 0;
         justify-content: flex-start;
         gap: 30px;
+    }
+
+    .product_item--top-wrapper {
+        justify-content: center !important;
+    }
+
+    .product_item--descr {
+        display: flex !important;
     }
 }
 
@@ -235,6 +300,10 @@ label {
 
 .product_item.--search-hide {
     display: none;
+}
+
+.product-value {
+    max-width: 100%;
 }
 
 .load-more {
